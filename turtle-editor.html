@@ -67,7 +67,7 @@
         <div id="network-popUp">
             <span id="operation">node</span> <br>
             <p style="float: left; margin-top: 18px;">label</p>
-            <input id="label" value="new value" style="margin-bottom: 15px; margin-top: 15px;" />
+            <input id="label" title="Tip: In order to add a literal, include the text in quotes" value="new value" style="margin-bottom: 15px; margin-top: 15px;" />
             <input type="button" value="save" id="saveButton" />
             <input type="button" value="cancel" id="cancelButton" />
         </div>
@@ -78,7 +78,9 @@
             <ul id="tabs-list">
                 <li><a href="#left-component">Graphical View</a></li>
                 <li><a href="#right-component">Code View</a></li>
-                <button type="button" id="split-button" class="button-style">Split View</button>
+                <button type="button" id="split-button" class="button-style">Split view</button>
+                <button type="button" id="freeze" class="button-style">Toggle freeze</button>
+                <button type="button" id="hide-nodes" class="button-style">Toggle defaults</button>
                 <!--<button type="button" id="disable-pshysics" class="button-style">Disable Physics</button>-->
                 <!--<button type="button" id="cluster-button" class="button-style">Cluster</button>-->
                 <input type="image" id="decluster" src="img/arrow_down.png" class="clustering-arrow" style="margin-right: 20px" />
