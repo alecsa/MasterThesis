@@ -51,7 +51,9 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	var tabsList = '<ul id="tabs-list"> \
 						<li><a href="#left-component">Graphical View</a></li> \
 						<li><a href="#right-component">Code View</a></li> \
-						<button type="button" id="split-button" class="button-style">Split View</button> \
+						<button type="button" id="split-button" class="button-style">Split view</button> \
+						<button type="button" id="freeze" class="button-style">Toggle freeze</button> \
+						<button type="button" id="hide-nodes" class="button-style">Toggle defaults</button> \
 						<input type="image" id="decluster" src="img/arrow_down.png" class="clustering-arrow" style="margin-right: 20px" /> \
 						<input type="image" id="cluster" src="img/arrow_up.png" class="clustering-arrow" style="margin-right: 10px" /> \
 						<label class="clustering-label">Clustering</label> \
@@ -80,7 +82,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		lineNumbers: true,
 		gutters:     ["CodeMirror-linenumbers", "breakpoints"],
 		extraKeys: { "Ctrl-Space": "autocomplete" }
-		//highlightSelectionMatches: { annotateScrollbar: true }
 	});
 
 	// trick to prevent re-updating the graphical view 
@@ -96,6 +97,9 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 	var oldTriples = [];
 	var newTriples = [];
+
+	var defaultPrefixes = ["rdf", "rdfs", "owl"];
+	var hidden = false;
 
 	editor.custom = {}; // to pass list of prefixes and names
 	editor.custom.dynamicNames = {};
@@ -507,8 +511,10 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	// Visualization ---------------------------------------------------------
 
 	var clearMarks = function() {
-		if (scrollbarMarks != null)
+		if (scrollbarMarks != null) {
 			scrollbarMarks.clear();
+			scrollbarMarks = null;
+		}
 		
 		textMarks.forEach(function (tm) {
 			tm.clear();
@@ -640,7 +646,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		network = new vis.Network(container, data, options);
 
 		// Clustering - if we click on a node, we want to open it up!
-		network.on("selectNode", function (params) {
+		network.on("click", function (params) {
 			if (params.nodes.length == 1) {
 				if (network.isCluster(params.nodes[0]) == true) {
 					network.openCluster(params.nodes[0])
@@ -653,7 +659,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 				}
 				else {
 					var nodeID = shrinkPrefix(params.nodes[0]);
-					var cursor = editor.getDoc().getSearchCursor(nodeID); // TODO: nodeID not followed by alpha-numeric characters
+					var query = new RegExp(nodeID + '(?![A-Za-z0-9_-])');
+					var cursor = editor.getDoc().getSearchCursor(query);
 					var res = cursor.findNext();
 
 					var doc = editor.getDoc();
@@ -661,18 +668,20 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 						doc.setCursor(cursor.pos.from.line);
 					
 					clearMarks();
-					scrollbarMarks = editor.showMatchesOnScrollbar(nodeID, true, "highlight-scrollbar");
+					scrollbarMarks = editor.showMatchesOnScrollbar(query, true, "highlight-scrollbar");
 					while(res) {
 						textMarks.push(doc.markText(cursor.pos.from, cursor.pos.to, {className: "highlight"}));
 						res = cursor.findNext();
 					}
 				}
 			}
+			else
+				clearMarks();
 		});
 		
 		// network.on("click", function (params) {
 			// if (params.nodes.length == 0) {
-				// clearmarks();
+				// clearMarks();
 			// }
 		// });
 	}
@@ -1001,6 +1010,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 			oldTriples = [];
 			newTriples = [];
 			
+			hidden = false;
+			
 			clusterIndex = 0;
 			clusters = [];
 			clusterLevel = 0;
@@ -1009,11 +1020,67 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		changeSyntaxCheckState("pending");
 	});
 
-	// editor.on("cursorActivity", function (editor) {
-		// var lineNumber = editor.getDoc().getCursor().line;
-		// var content = editor.getDoc().getLine(lineNumber);
+	 editor.on("cursorActivity", function (editor) {
+		 //var lineNumber = editor.getDoc().getCursor().line;
+		 //var content = editor.getDoc().getLine(lineNumber);
+	 	clearMarks();
+	 });
 
-	// });
+	//$("#label").on('click', function () {
+	//	this.title = $(this).data('att');
+	// 	alert(this.title);
+	//});
+
+	function getAbbreviatedNamespace(str) {
+		var ind = str.indexOf(":");
+
+		if (ind != -1)
+			return str.substring(0, ind);
+
+		return "";
+	}
+
+	$("#tabs").on("click", "#hide-nodes", function () {
+		hidden = !hidden;
+		//var items = network.body.data.nodes.get({
+		//	filter: function (elem) {
+		//		return (defaultPrefixes.indexOf(getAbbreviatedNamespace(elem.label)) != -1);
+		//	}
+		//});
+		//items.forEach(function (item) {
+		//	network.body.data.nodes._data[item.id].hidden = !network.body.data.nodes._data[item.id].hidden;
+		//});
+		////network.redraw();
+		
+
+		var lev = clusterLevel;
+		while(clusterLevel > 0)
+			openClusters();
+
+		var nodes = network.body.data.nodes.get();
+
+		nodes.forEach(function (n) {
+			if (defaultPrefixes.indexOf(getAbbreviatedNamespace(n.label)) != -1) {
+				n.hidden = hidden;
+				network.getConnectedEdges(n.id).forEach(function (e) {
+					if (network.body.data.edges._data[e])
+						network.body.data.edges._data[e].hidden = hidden;
+				});
+			}
+		});
+
+		network.setData({ nodes: nodes, edges: network.body.data.edges.get() });
+		clusterLevel = 0;
+
+		for (var i = 0; i < lev; i++) {
+			makeClusters();
+		}
+	});
+
+	$("#tabs").on("click", "#freeze", function () {
+		network.physics.options.enabled = !network.physics.options.enabled;
+		network.startSimulation();
+	});
 
 	$("#tabs").on("click", "#cluster", function () {
 		makeClusters();
