@@ -18,7 +18,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
         active: 1
     });
     $("#tabs").css("visibility", "visible");
-  
+
+    $("#label").tooltip();
 
 	var menu =  $("#menu");
 
@@ -54,8 +55,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 						<button type="button" id="split-button" class="button-style">Split view</button> \
 						<button type="button" id="freeze" class="button-style">Toggle freeze</button> \
 						<button type="button" id="hide-nodes" class="button-style">Toggle defaults</button> \
-						<input type="image" id="decluster" src="img/arrow_down.png" class="clustering-arrow" style="margin-right: 20px" /> \
-						<input type="image" id="cluster" src="img/arrow_up.png" class="clustering-arrow" style="margin-right: 10px" /> \
+						<input type="image" id="decluster" src="img/minus.png" class="clustering-arrow" style="margin-right: 20px" /> \
+						<input type="image" id="cluster" src="img/plus.png" class="clustering-arrow" style="margin-right: 10px" /> \
 						<label class="clustering-label">Clustering</label> \
 					</ul>';
 
@@ -377,19 +378,19 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
   
 	// Syntax Check -------------------------------------------------------------
 
-	var toggleChecking = function () {
-		console.log("toggleChecking");
-		if (state.syntaxCheck === "off") {
-			console.log("-> pending");
-			changeSyntaxCheckState("pending", undefined, true);
-		}
-		else {
-			changeSyntaxCheckState("off");
-			console.log("-> off");
-		}
-	};
+	//var toggleChecking = function () {
+	//	console.log("toggleChecking");
+	//	if (state.syntaxCheck === "off") {
+	//		console.log("-> pending");
+	//		changeSyntaxCheckState("pending", undefined, true);
+	//	}
+	//	else {
+	//		changeSyntaxCheckState("off");
+	//		console.log("-> off");
+	//	}
+	//};
 
-	syntaxCheckElements.checker.on("click", toggleChecking);
+	//syntaxCheckElements.checker.on("click", toggleChecking);
 
 	var makeMarker = function (errorMessage) {
 		var marker = document.createElement("div");
@@ -521,6 +522,10 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		});
 		textMarks = [];
 	}
+
+	var confirmDeletion = function() {
+
+	}
 	
 	var shrinkPrefix = function (iri) {
 		for (var ns in editor.custom.prefixes) {
@@ -603,8 +608,14 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 					document.getElementById('network-popUp').style.display = 'block';
 				},
 				deleteNode: function (data, callback) {
-					var r = confirm("Delete possible orphaned nodes too?");
-					delNode(data, r, callback);
+					$("#dialog").dialog({
+						dialogClass: "no-close",
+						buttons: {
+							YES: function () { $(this).dialog("close"); delNode(data, true, callback); },
+							NO: function () { $(this).dialog("close"); delNode(data, false, callback); },
+							cancel: function () { $(this).dialog("close"); callback(); }
+						}
+					}).css("display", "block");
 				},
 				addEdge: function (data, callback) {
 					document.getElementById('operation').innerHTML = "Add Edge";
@@ -632,8 +643,14 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 					document.getElementById('network-popUp').style.display = 'block';
 				},
 				deleteEdge: function (data, callback) {
-					var r = confirm("Delete possible orphaned nodes too?");
-					delEdge(data, r, callback);
+					$("#dialog").dialog({
+						dialogClass: "no-close",
+						buttons: {
+							YES: function () { $(this).dialog("close"); delEdge(data, true, callback); },
+							NO: function () { $(this).dialog("close"); delEdge(data, false, callback); },
+							cancel: function () { $(this).dialog("close"); callback(); }
+						}
+					}).css("display", "block");
 				}
 			},
 			physics: {
@@ -1042,39 +1059,28 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 	$("#tabs").on("click", "#hide-nodes", function () {
 		hidden = !hidden;
-		//var items = network.body.data.nodes.get({
-		//	filter: function (elem) {
-		//		return (defaultPrefixes.indexOf(getAbbreviatedNamespace(elem.label)) != -1);
-		//	}
-		//});
-		//items.forEach(function (item) {
-		//	network.body.data.nodes._data[item.id].hidden = !network.body.data.nodes._data[item.id].hidden;
-		//});
-		////network.redraw();
-		
 
 		var lev = clusterLevel;
 		while(clusterLevel > 0)
 			openClusters();
 
-		var nodes = network.body.data.nodes.get();
-
-		nodes.forEach(function (n) {
-			if (defaultPrefixes.indexOf(getAbbreviatedNamespace(n.label)) != -1) {
-				n.hidden = hidden;
-				network.getConnectedEdges(n.id).forEach(function (e) {
-					if (network.body.data.edges._data[e])
-						network.body.data.edges._data[e].hidden = hidden;
+		for (var key in network.body.nodes) {
+			if (defaultPrefixes.indexOf(getAbbreviatedNamespace(network.body.nodes[key].labelModule.lines[0])) != -1) {
+				network.body.nodes[key].options.hidden = hidden;
+				network.getConnectedEdges(key).forEach(function (e) {
+						network.body.edges[e].options.hidden = hidden;
 				});
 			}
-		});
+		}
 
-		network.setData({ nodes: nodes, edges: network.body.data.edges.get() });
 		clusterLevel = 0;
-
 		for (var i = 0; i < lev; i++) {
 			makeClusters();
 		}
+	});
+
+	$(window).ready(function () {
+		initializeGraphicalView(true);
 	});
 
 	$("#tabs").on("click", "#freeze", function () {

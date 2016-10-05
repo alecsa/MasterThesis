@@ -130,3 +130,6 @@ div.menu3sub
     border:1px solid #CAD0DB;
     background:#E9ECF0;
 }
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}

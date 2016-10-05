@@ -19,15 +19,15 @@
 
 <body>
     <section id="message-queue"></section>
-        <div class="container menu3">
+        <!--<div class="container menu3">
            <a id="doc-link" href="http://ok-mobivoc.iais.fraunhofer.de/docs/schemas.html" target="doc-view">Documentation</a> 
            <a id="sparql-link" href="https://rawgit.com/vocol/vocol/master/SparqlProcessor/sparql-processor.html" target="github-view">Sparql Processor</a> 
            <a id="github-link" href="" target="github-view">GitHub Repository</a>
-        </div>
+        </div>-->
     <div class="container">
         <header>
             <div class="page-header">
-                <h1>Editing Turtle on GitHub <small>Load, view, edit, check, and save a turtle file on GitHub.</small></h1>
+                <h2>A Synchronized Graphical and Source Code Editor for RDF Vocabularies</h2>
             </div>
             <!-- <p class="lead">
             </p> --> 
@@ -67,9 +67,12 @@
         <div id="network-popUp">
             <span id="operation">node</span> <br>
             <p style="float: left; margin-top: 18px;">label</p>
-            <input id="label" title="Tip: In order to add a literal, include the text in quotes" value="new value" style="margin-bottom: 15px; margin-top: 15px;" />
+            <input id="label" title='Tip: In order to add a literal, include the text in quotes, e.g. "new"' value="new value" style="margin-bottom: 15px; margin-top: 15px;" />
             <input type="button" value="save" id="saveButton" />
             <input type="button" value="cancel" id="cancelButton" />
+        </div>
+        <div id="dialog" style="display:none">
+            <p>Delete possible orphaned nodes too?</p>
         </div>
         <div id="back-div" style="display:none">
             <button type="button" id="unsplit-button" class="button-style">Back</button>
@@ -83,8 +86,8 @@
                 <button type="button" id="hide-nodes" class="button-style">Toggle defaults</button>
                 <!--<button type="button" id="disable-pshysics" class="button-style">Disable Physics</button>-->
                 <!--<button type="button" id="cluster-button" class="button-style">Cluster</button>-->
-                <input type="image" id="decluster" src="img/arrow_down.png" class="clustering-arrow" style="margin-right: 20px" />
-                <input type="image" id="cluster" src="img/arrow_up.png" class="clustering-arrow" style="margin-right: 10px" />
+                <input type="image" id="decluster" src="img/minus.png" class="clustering-arrow" style="margin-right: 20px" />
+                <input type="image" id="cluster" src="img/plus.png" class="clustering-arrow" style="margin-right: 10px" />
                 <label class="clustering-label">Clustering</label>
             </ul>
             <div id="left-component" class="split-pane-component"></div>
@@ -121,9 +124,9 @@
                     <input type="text" class="form-control" id="input-message"
                            value="Turtle file edited, just for testing the editor.">
                 </div>
-                <div class="">
+                <!--<div class="">
                     <a id="webvowl-link" href="" target="vowl-view">View <span class="current-filename">-</span> in WebVOWL</a>
-                </div>
+                </div>-->
             </div><!-- /.col-md-9 -->
         </div>
     </div><!-- /.row -->
@@ -136,7 +139,6 @@
 		            <li>For a quick tour, leave the fields <em>Username</em> and <em>Password</em> blank and just click the <em>Load Files</em> button.</li>
                     <li>Select individual files for viewing/editing in the field <em>Filename</em>.</li>
                     <li>To use the autocomplete function, type <em>Ctrl+Space</em>.</li>
-                    <li>Click the colored sphere to temporarily disable syntax checking.</li>
                     <li>You need to provide your username and password only if you want to save the files after editing or if the repository is private.</li>
                     <li>To authenticate with a GitHub personal access token, leave the fields <em>Username</em> empty and paste the token into the field <em>Password or Token</em>.</li>
                 </ul>
