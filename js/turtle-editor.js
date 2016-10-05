@@ -134,16 +134,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		if (endl != -1)
 			clusterLabel = clusterLabel.substring(0, endl);
 
-		//var back = true;
-		//while (clusterLabel.length < labelMaxLength) {
-		//	if (back)
-		//		clusterLabel = clusterLabel + ' ';
-		//	else
-		//		clusterLabel = ' ' + clusterLabel;
-
-		//	back = !back;
-		//}
-
 		return clusterLabel;
 	}
 
@@ -174,16 +164,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 				clusterOptions.childrenCount = childrenCount;
 				clusterOptions.size = childrenCount * 4 + 15;
-				//clusterOptions.scaling = {
-				//	min: 10,
-				//	max: 30,
-				//	label: {
-				//		enabled: false,
-				//	}
-				//};
 				clusterOptions.label = getClusterLabel(subjectNode) + "\n(" + childrenCount + " nodes)";
-				//if (subjectNode.title != null)
-				//	clusterOptions.title = subjectNode.title;
 				clusterOptions.id = 'cluster:' + clusterIndex;
 				clusterOptions.mass = 0.5 * childrenCount;
 
@@ -377,20 +358,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	// "http://vowl.visualdataweb.org/webvowl/index.html#iri=https://raw.githubusercontent.com/mobivoc/mobivoc/master/"
   
 	// Syntax Check -------------------------------------------------------------
-
-	//var toggleChecking = function () {
-	//	console.log("toggleChecking");
-	//	if (state.syntaxCheck === "off") {
-	//		console.log("-> pending");
-	//		changeSyntaxCheckState("pending", undefined, true);
-	//	}
-	//	else {
-	//		changeSyntaxCheckState("off");
-	//		console.log("-> off");
-	//	}
-	//};
-
-	//syntaxCheckElements.checker.on("click", toggleChecking);
 
 	var makeMarker = function (errorMessage) {
 		var marker = document.createElement("div");
@@ -695,12 +662,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 			else
 				clearMarks();
 		});
-		
-		// network.on("click", function (params) {
-			// if (params.nodes.length == 0) {
-				// clearMarks();
-			// }
-		// });
 	}
 
 	// Syncronization --------------------------------------------------------
@@ -755,7 +716,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	}
 
 	function saveNode(data, callback) {
-		var start = new Date().getTime();
+		//var start = new Date().getTime();
 		var label = document.getElementById('label').value;
 		var id = N3.Util.expandPrefixedName(label, editor.custom.prefixes);
 
@@ -831,7 +792,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	}
 
 	function saveEdge(data, callback) {
-		//var start = new Date().getTime();
 		var label = document.getElementById('label').value;
 		clearPopUp();
 		
@@ -881,10 +841,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 			triplesToTurtle();
 		}
-
-		//var end = new Date().getTime();
-		//var time = end - start;
-		//alert('Execution time: ' + time);
 	}
 
 	function delEdge(data, del, callback) {
@@ -1043,11 +999,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	 	clearMarks();
 	 });
 
-	//$("#label").on('click', function () {
-	//	this.title = $(this).data('att');
-	// 	alert(this.title);
-	//});
-
 	function getAbbreviatedNamespace(str) {
 		var ind = str.indexOf(":");
 
@@ -1072,6 +1023,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 				});
 			}
 		}
+
+		network.body.emitter.emit('_dataChanged');
 
 		clusterLevel = 0;
 		for (var i = 0; i < lev; i++) {
