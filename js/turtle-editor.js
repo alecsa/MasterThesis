@@ -53,11 +53,13 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 						<li><a href="#left-component">Graphical View</a></li> \
 						<li><a href="#right-component">Code View</a></li> \
 						<button type="button" id="split-button" class="button-style">Split view</button> \
-						<button type="button" id="freeze" class="button-style">Toggle freeze</button> \
-						<button type="button" id="hide-nodes" class="button-style">Toggle defaults</button> \
-						<input type="image" id="decluster" src="img/minus.png" class="clustering-arrow" style="margin-right: 20px" /> \
-						<input type="image" id="cluster" src="img/plus.png" class="clustering-arrow" style="margin-right: 10px" /> \
-						<label class="clustering-label">Clustering</label> \
+						<input type="checkbox" id="freeze" class="menu-checkbox" style="margin-top:8px"> \
+						<label class="menu-label">Freeze</label> \
+						<input type="checkbox" id="hide-nodes" class="menu-checkbox" style="margin-top:8px"> \
+						<label class="menu-label">Hide defaults</label> \
+						<input type="image" id="decluster" src="img/minus.png" class="clustering-button" style="margin-right: 20px" /> \
+						<input type="image" id="cluster" src="img/plus.png" class="clustering-button" style="margin-right: 10px" /> \
+						<label class="menu-label">Clustering</label> \
 					</ul>';
 
 	// Editor state -------------------------------------------------------------
@@ -100,7 +102,9 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	var newTriples = [];
 
 	var defaultPrefixes = ["rdf", "rdfs", "owl"];
-	var hidden = false;
+	var basePrefix = "";
+	var hidden = true;
+	var freeze = false;
 
 	editor.custom = {}; // to pass list of prefixes and names
 	editor.custom.dynamicNames = {};
@@ -629,10 +633,9 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 		network = new vis.Network(container, data, options);
 
-		// Clustering - if we click on a node, we want to open it up!
 		network.on("click", function (params) {
 			if (params.nodes.length == 1) {
-				if (network.isCluster(params.nodes[0]) == true) {
+				if (network.isCluster(params.nodes[0]) == true) { // if the node is a cluster, we open it up
 					network.openCluster(params.nodes[0])
 
 					for (var i = 0; i < clusters.length; i++)
@@ -641,7 +644,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 							break;
 						}
 				}
-				else {
+				else { // if the node is not a cluster, we highlight its matches in the code view
 					var nodeID = shrinkPrefix(params.nodes[0]);
 					var query = new RegExp(nodeID + '(?![A-Za-z0-9_-])');
 					var cursor = editor.getDoc().getSearchCursor(query);
@@ -665,6 +668,21 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 	}
 
 	// Syncronization --------------------------------------------------------
+
+	function getBasePrefix() {
+		var cursor = editor.getDoc().getSearchCursor("@base");
+		var res = cursor.findNext();
+
+		var line = "";
+		if (res)
+			line = editor.getDoc().getLine(cursor.pos.from.line);
+
+		var startPos = line.indexOf("<");
+		var endPos = line.indexOf(">");
+
+		if (startPos > -1 && endPos > -1)
+			basePrefix = line.substring(startPos + 1, endPos);
+	}
 
 	function triplesEqual(t1, t2) {
 		return t1.subject == t2.subject && t1.predicate == t2.predicate && t1.object == t2.object;
@@ -764,6 +782,10 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 			network.body.data.nodes.remove(data.id);
 		}
 		else { // add new node
+			if (label.indexOf(":") == -1) { // if no prefix is provided, we prepend the base prefix
+				getBasePrefix();
+				id = basePrefix + label;
+			}
 			var node = getPreparedNode(id, "");
 			node.x = data.x;
 			node.y = data.y;
@@ -772,8 +794,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 		clearPopUp();
 
-		var end = new Date().getTime();
-		var time = end - start;
+		//var end = new Date().getTime();
+		//var time = end - start;
 		//alert('Execution time: ' + time);
 	}
 
@@ -817,6 +839,11 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 					network.body.data.nodes.update({ id: data.from, type: "subject" })
 				if (network.getConnectedEdges(data.to).length == 1)
 					network.body.data.nodes.update({ id: data.to, type: "object" })
+			}
+
+			if (label.indexOf(":") == -1) { // if no prefix is provided, we prepend the base prefix
+				getBasePrefix();
+				label = shrinkPrefix(basePrefix + label);
 			}
 
 			network.body.data.edges.remove(items[0]);
@@ -964,6 +991,11 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 		oldTriples = newTriples.slice();
 		newTriples = [];
+
+		hidden = true;
+		//$('#hide-nodes').attr('checked', true);
+		toggle_hide_defaults();
+		document.getElementById("hide-nodes").checked = true;
 	};
   
 
@@ -1008,18 +1040,21 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		return "";
 	}
 
-	$("#tabs").on("click", "#hide-nodes", function () {
-		hidden = !hidden;
 
+	$(window).ready(function () {
+		initializeGraphicalView(true);
+	});
+
+	function toggle_hide_defaults() {
 		var lev = clusterLevel;
-		while(clusterLevel > 0)
+		while (clusterLevel > 0)
 			openClusters();
 
 		for (var key in network.body.nodes) {
 			if (defaultPrefixes.indexOf(getAbbreviatedNamespace(network.body.nodes[key].labelModule.lines[0])) != -1) {
 				network.body.nodes[key].options.hidden = hidden;
 				network.getConnectedEdges(key).forEach(function (e) {
-						network.body.edges[e].options.hidden = hidden;
+					network.body.edges[e].options.hidden = hidden;
 				});
 			}
 		}
@@ -1030,15 +1065,22 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		for (var i = 0; i < lev; i++) {
 			makeClusters();
 		}
+	}
+
+	$("#tabs").on("click", "#hide-nodes", function () {
+		hidden = !hidden;
+		toggle_hide_defaults();
 	});
 
-	$(window).ready(function () {
-		initializeGraphicalView(true);
-	});
+	function toggle_freeze() {
+		network.stopSimulation();
+		network.physics.options.enabled = !freeze;
+		network.startSimulation();
+	}
 
 	$("#tabs").on("click", "#freeze", function () {
-		network.physics.options.enabled = !network.physics.options.enabled;
-		network.startSimulation();
+		freeze = !freeze;
+		toggle_freeze();
 	});
 
 	$("#tabs").on("click", "#cluster", function () {
@@ -1100,6 +1142,15 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 		$('div.split-pane-divider').css("visibility", "hidden");
 		$('#back-div').css("display", "none");
+
+		if (hidden)
+			$('#hide-nodes').attr('checked', true);
+
+		if (freeze)
+			$('#freeze').attr('checked', true);
+
+		toggle_hide_defaults();
+		toggle_freeze();
 	});
 
 	// Repeated actions ---------------------------------------------------------
