@@ -8,6 +8,7 @@ var require = {
     github: 'lib/github',
     vis: 'lib/vis',
     underscore: 'lib/underscore-min',
+    splitPane: 'lib/split-pane',
     waitSeconds: 0
   }, 
   shim: { // see http://requirejs.org/docs/api.html#config-shim

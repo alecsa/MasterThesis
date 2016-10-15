@@ -4,22 +4,15 @@
 // and https://github.com/RubenVerborgh/N3.js (Turtle parser)
 
 
-define(['jquery', 'jqueryui', 'github', 'vis', 'underscore', 'N3', 'lib/codemirror',
-        'addon/hint/show-hint', 'addon/search/searchcursor',
+define(['jquery', 'jqueryui', 'github', 'vis', 'underscore', 'N3', 'splitPane',
+		'lib/codemirror', 'addon/hint/show-hint', 'addon/search/searchcursor',
 		'addon/search/matchesonscrollbar', 'addon/scroll/annotatescrollbar',
-		'mode/turtle/turtle', 'hint/turtle-hint', 'lib/split-pane', 'logger'],
+		'mode/turtle/turtle', 'hint/turtle-hint', 'logger'],
 
-function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, SearchCursor,
-	MatchesOnScrollbar, AnnotateScrollbar, ModeTurtle, HintTurtle, SplitPane, logger) {
+function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowHint, SearchCursor,
+	MatchesOnScrollbar, AnnotateScrollbar, ModeTurtle, HintTurtle, logger) {
 
   // HTML elements ------------------------------------------------------------
- 
-    $("#tabs").tabs({
-        active: 1
-    });
-    $("#tabs").css("visibility", "visible");
-
-    $("#label").tooltip();
 
 	var menu =  $("#menu");
 
@@ -565,6 +558,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 				addNode: function (data, callback) {
 					// filling in the popup DOM elements
 					document.getElementById('operation').innerHTML = "Add Node";
+					$("#label").tooltip("enable");
 					document.getElementById('label').value = data.label;
 					document.getElementById('saveButton').onclick = saveNode.bind(this, data, callback);
 					document.getElementById('cancelButton').onclick = clearPopUp.bind();
@@ -573,6 +567,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 				editNode: function (data, callback) {
 					// filling in the popup DOM elements
 					document.getElementById('operation').innerHTML = "Edit Node";
+					$("#label").tooltip("disable");
 					document.getElementById('label').value = data.title != null ? data.title : data.label;
 					document.getElementById('saveButton').onclick = saveNode.bind(this, data, callback);
 					document.getElementById('cancelButton').onclick = cancelEdit.bind(this, callback);
@@ -590,6 +585,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 				},
 				addEdge: function (data, callback) {
 					document.getElementById('operation').innerHTML = "Add Edge";
+					$("#label").tooltip("disable");
 					document.getElementById('label').value = "new";
 					document.getElementById('saveButton').onclick = saveEdge.bind(this, data, callback);
 					document.getElementById('cancelButton').onclick = clearEdge.bind(this, data);
@@ -608,6 +604,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 				editEdge: function (data, callback) {
 					// filling in the popup DOM elements
 					document.getElementById('operation').innerHTML = "Edit Edge";
+					$("#label").tooltip("disable");
 					document.getElementById('label').value = data.label;
 					document.getElementById('saveButton').onclick = saveEdge.bind(this, data, callback);
 					document.getElementById('cancelButton').onclick = cancelEdit.bind(this, callback);
@@ -998,6 +995,16 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 		document.getElementById("hide-nodes").checked = true;
 	};
   
+	$(window).ready(function () {
+		$("#tabs").tabs({
+			active: 1
+		});
+		$("#tabs").css("visibility", "visible");
+
+		$("#label").tooltip();
+
+		initializeGraphicalView(true);
+	});
 
 	// Event listeners ----------------------------------------------------------
 
@@ -1039,11 +1046,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, CodeMirror, ShowHint, Search
 
 		return "";
 	}
-
-
-	$(window).ready(function () {
-		initializeGraphicalView(true);
-	});
 
 	function toggle_hide_defaults() {
 		var lev = clusterLevel;
