@@ -671,14 +671,17 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 		var res = cursor.findNext();
 
 		var line = "";
-		if (res)
+		if (res) {
 			line = editor.getDoc().getLine(cursor.pos.from.line);
 
-		var startPos = line.indexOf("<");
-		var endPos = line.indexOf(">");
+			var startPos = line.indexOf("<");
+			var endPos = line.indexOf(">");
 
-		if (startPos > -1 && endPos > -1)
-			basePrefix = line.substring(startPos + 1, endPos);
+			if (startPos > -1 && endPos > -1)
+				basePrefix = line.substring(startPos + 1, endPos);
+		}
+		else
+			basePrefix = "";
 	}
 
 	function triplesEqual(t1, t2) {
@@ -721,9 +724,24 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 	function triplesToTurtle() {
 		changeFromSync = true;
 
+		getBasePrefix();
+
 		var writer = N3.Writer({ prefixes: editor.custom.prefixes });
 		writer.addTriples(oldTriples);
 		writer.end(function (error, result) { editor.setValue(result); });
+
+		if (basePrefix != "") {
+			var cursor = editor.getDoc().getSearchCursor("@prefix");
+			var res = cursor.findNext();
+
+			var line = 0;
+			while (res) {
+				line = cursor.pos.from.line;
+				res = cursor.findNext();
+			}
+
+			editor.getDoc().replaceRange("@base <" + basePrefix + "> .\n", { line: line + 1, ch: 0 });
+		}
 	}
 
 	function triplesDiff(a1, a2) {
