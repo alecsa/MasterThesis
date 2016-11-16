@@ -65,7 +65,7 @@
             <input type="button" value="cancel" id="cancelButton" />
         </div>
         <div id="dialog" style="display:none">
-            <p>Delete possible orphaned nodes too?</p>
+            <p>It is possible that some nodes will remain disconnected from the graph after deletion. Remove them too?</p>
         </div>
         <div id="back-div" style="display:none">
             <button type="button" id="unsplit-button" class="button-style">Back</button>
@@ -76,9 +76,9 @@
                 <li><a href="#right-component">Code View</a></li>
                 <button type="button" id="split-button" class="button-style">Split view</button>
                 <input type="checkbox" id="freeze" class="menu-checkbox" style="margin-top:8px">
-                <label class="menu-label">Freeze</label>
+                <label class="menu-label" title="Disable the physics of the network">Freeze</label>
                 <input type="checkbox" id="hide-nodes" checked="checked" class="menu-checkbox" style="margin-top:8px">
-                <label class="menu-label">Hide defaults</label>
+                <label class="menu-label" title="Hide nodes from the RDF, RDFS and OWL vocabularies">Hide defaults</label>
                 <!--<button type="button" id="freeze" class="button-style">Toggle freeze</button>
                 <button type="button" id="hide-nodes" class="button-style">Toggle defaults</button>-->
                 <input type="image" id="decluster" src="img/minus.png" class="clustering-button" style="margin-right: 20px" />
