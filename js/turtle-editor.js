@@ -47,9 +47,9 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 						<li><a href="#right-component">Code View</a></li> \
 						<button type="button" id="split-button" class="button-style">Split view</button> \
 						<input type="checkbox" id="freeze" class="menu-checkbox" style="margin-top:8px"> \
-						<label class="menu-label">Freeze</label> \
+						<label class="menu-label" title="Disable the physics of the network">Freeze</label> \
 						<input type="checkbox" id="hide-nodes" class="menu-checkbox" style="margin-top:8px"> \
-						<label class="menu-label">Hide defaults</label> \
+						<label class="menu-label" title="Hide nodes from the RDF, RDFS and OWL vocabularies">Hide defaults</label> \
 						<input type="image" id="decluster" src="img/minus.png" class="clustering-button" style="margin-right: 20px" /> \
 						<input type="image" id="cluster" src="img/plus.png" class="clustering-button" style="margin-right: 10px" /> \
 						<label class="menu-label">Clustering</label> \
@@ -486,10 +486,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 		});
 		textMarks = [];
 	}
-
-	var confirmDeletion = function() {
-
-	}
 	
 	var shrinkPrefix = function (iri) {
 		for (var ns in editor.custom.prefixes) {
@@ -699,7 +695,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 	function insertTripleIntoArray(arr, t) {
 		for (var i = 0; i < arr.length; i++)
 			if (arr[i].subject == t.subject) {
-				while (arr[++i].subject == t.subject) { }
+				while (i < arr.length && arr[i].subject == t.subject) { i++; }
 				arr.splice(i, 0, t);
 				return;
 			}
@@ -723,6 +719,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 
 	function triplesToTurtle() {
 		changeFromSync = true;
+		var current_cursor = editor.getDoc().getCursor();
 
 		getBasePrefix();
 
@@ -742,6 +739,8 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 
 			editor.getDoc().replaceRange("@base <" + basePrefix + "> .\n", { line: line + 1, ch: 0 });
 		}
+
+		editor.getDoc().setCursor(current_cursor);
 	}
 
 	function triplesDiff(a1, a2) {
@@ -750,8 +749,14 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 
 	function saveNode(data, callback) {
 		//var start = new Date().getTime();
-		var label = document.getElementById('label').value;
+		var label = shrinkPrefix(document.getElementById('label').value);
 		var id = N3.Util.expandPrefixedName(label, editor.custom.prefixes);
+
+		var existing = network.body.data.nodes.get(id);
+		if (existing != null) {
+			alert("A node with this label already exists!");
+			return;
+		}
 
 		var node = network.body.data.nodes.get(data.id);
 		if (node != null) { // update existing node (this assumes actually deleting the 
