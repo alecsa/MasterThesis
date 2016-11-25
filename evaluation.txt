@@ -8,12 +8,14 @@ TASKS
 - Load Country.ttl. Go to the graphical view and add a new language label for mv:Country (e.g. "Pays"@fr).
 - Uncheck "Hide defaults" in order to see the nodes from the rdf and rdfs vocabularies.
 - Click "Split view".
+The following tasks shall be done using the graphical view.
 - Define a new property by adding a node (e.g. Prop1) and make it of type (rdf:type) rdf:Property.
 - Click on the new node to see it in text.
 - Make mv:Country the property's domain (rdfs:domain) and rdfs:literal its range (rdfs:range).
 - Add a description for the property.
 - Modify the property's label (e.g. Prop2).
-- Delete the property node using the code view.
+The following task shall be done using the code view.
+- Delete the property node.
 
 -----------------------------------------------------------------------------------------
 
