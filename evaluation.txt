@@ -13,7 +13,7 @@ TASKS
 - Make mv:Country the property's domain (rdfs:domain) and rdfs:literal its range (rdfs:range).
 - Add a description for the property.
 - Modify the property's label (e.g. Prop2).
-- Delete the property node. 
+- Delete the property node using the code view.
 
 -----------------------------------------------------------------------------------------
 
