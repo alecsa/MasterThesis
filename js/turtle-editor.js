@@ -956,6 +956,10 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 				makeClusters();
 			if (newTriples.length > 1000)
 				makeClusters();
+			
+			hidden = true;
+			toggle_hide_defaults();
+			document.getElementById("hide-nodes").checked = true;
 		}
 		else {
 			var a1 = N3.Store();
@@ -1012,11 +1016,6 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 
 		oldTriples = newTriples.slice();
 		newTriples = [];
-
-		hidden = true;
-		//$('#hide-nodes').attr('checked', true);
-		toggle_hide_defaults();
-		document.getElementById("hide-nodes").checked = true;
 	};
   
 	$(window).ready(function () {
