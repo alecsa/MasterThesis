@@ -6,7 +6,7 @@
 TASKS
 
 - Load Country.ttl. Go to the graphical view and add a new language label for mv:Country (e.g. "Pays"@fr).
-- Uncheck "Hide defaults" in order to see the nodes from the rdf and rdfs vocabularies.
+- Uncheck "Hide defaults" in order to see the nodes from the RDF, RDFS and OWL vocabularies.
 - Click "Split view".
 The following tasks shall be done using the graphical view.
 - Define a new property by adding a node (e.g. Prop1) and make it of type (rdf:type) rdf:Property.
