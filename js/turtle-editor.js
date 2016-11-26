@@ -592,6 +592,7 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 						if (r == true) {
 							callback(data);
 						}
+						clearPopUp();
 					}
 					else {
 						callback(data);
