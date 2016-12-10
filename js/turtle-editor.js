@@ -751,8 +751,16 @@ function ($, JQueryUI, Github, vis, underscore, N3, SplitPane, CodeMirror, ShowH
 	function saveNode(data, callback) {
 		//var start = new Date().getTime();
 		var label = shrinkPrefix(document.getElementById('label').value);
-		var id = N3.Util.expandPrefixedName(label, editor.custom.prefixes);
-
+		var id = "";
+		
+		try {
+			id = N3.Util.expandPrefixedName(label, editor.custom.prefixes);
+		}
+		catch(err) {
+			alert(err + ". Hint: The prefix has to be defined in the code view.");
+			return;
+		}
+		
 		var existing = network.body.data.nodes.get(id);
 		if (existing != null) {
 			alert("A node with this label already exists!");
