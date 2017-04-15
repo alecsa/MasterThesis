@@ -1,0 +1,74 @@
+\ProvidesPackage{thesisstyle}
+
+% Uni-Bonn title page style
+\usepackage{MA_Titlepage}
+
+\usepackage{hyperref}
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Subsection}
+\def\chapterautorefname{Chapter}
+\def\figureautorefname{Figure}
+\def\tableautorefname{Table}
+\def\algorithmautorefname{Algorithm}
+
+%\usepackage[
+%	backend=biber,
+%	sortlocale=en_US,
+%	natbib=true,
+%	hyperref=true,
+%	style=authoryear-comp,
+%	bibencoding=utf8
+%]{biblatex}
+
+% math
+%\usepackage{amsthm}
+%\usepackage{amsmath}
+%\usepackage{amsfonts}
+%\usepackage{mathrsfs}
+%\newtheorem{theorem}{Theorem}[chapter]
+%\newtheorem{claim}{Claim}[chapter]
+%\DeclareMathOperator*{\argmin}{arg\,min}
+%\DeclareMathOperator*{\argmax}{arg\,max}
+
+% algorithms
+%\usepackage[chapter]{algorithm}
+%\usepackage{algpseudocode}
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
+%\algnewcommand\func{\texttt}
+%\algnewcommand\class{\textsc}
+
+% tables
+%\usepackage{booktabs}
+%\usepackage{caption}
+%\captionsetup[table]{skip=5pt}
+
+% lists
+\usepackage[ampersand]{easylist}
+\usepackage{enumitem}
+
+% graphics
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{lscape}
+
+% numbers
+\usepackage{siunitx}
+\sisetup{round-mode=places,round-precision=3,add-integer-zero=false}
+
+% company superscripts
+%\usepackage{textcomp}
+
+% for support of unicode in the citations
+%\usepackage{fontspec}
+\usepackage[utf8]{inputenc}
+
+% custom
+\newcommand{\email}[1]{\href{mailto:#1}{#1}}
+
+% keywords
+\def\keywords{\vspace{.5em}
+{\textbf{Keywords}:\,\relax%
+}}
+\def\endkeywords{\par}
+

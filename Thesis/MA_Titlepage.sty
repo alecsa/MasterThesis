@@ -1,0 +1,78 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{MA_Titlepage}[2010/04/25]
+
+%%%%%%%%%%%%%%%%
+% Titelseite:
+%%%%%%%%%%%%%%%%
+\newcommand*{\supervisors}[1]{\def\@supervisors{#1}}
+\supervisors{}
+\newcommand*{\ausarbeitungstyp}[1]{\def\@ausarbeitungstyp{#1}}
+\ausarbeitungstyp{}
+\newcommand*{\geburtsdatum}[1]{\def\@geburtsdatum{#1}}
+\geburtsdatum{}
+\newcommand*{\geburtsort}[1]{\def\@geburtsort{#1}}
+\geburtsort{}
+\newcommand*{\institut}[1]{\def\@institut{#1}}
+\institut{}
+\newcommand*{\authornew}[1]{\def\@authornew{#1}}
+\authornew{}
+\newcommand*{\matriculationnumber}[1]{\def\@matriculationnumber{#1}}
+\matriculationnumber{}
+
+\renewcommand\maketitle{\begin{titlepage}
+  \let\footnotesize\small
+  \let\footnoterule\relax
+  \let \footnote \thanks
+  \null\vfil
+
+\begin{center}%
+
+\parbox{\columnwidth}{\centering\LARGE\bfseries \@title \par}\\
+\vspace{1em}
+{\Large
+\vspace{1em}
+\@authornew}\\
+\vspace{1em}
+{\large Matriculation number: \@matriculationnumber}\\
+%Born   \@geburtsdatum \ in \@geburtsort\\
+\vspace{1em}
+{\large \@date}
+\vspace{4em}
+
+{\large \@ausarbeitungstyp}\\
+\vspace{4em}
+{\large Supervisors:\\
+\vspace{1em}
+\@supervisors}\\
+%\vspace{2.5em}
+%\centerline{{\large\sc \@institut}}
+\vspace{14em}
+
+%\centerline{{\large\sc Mathematisch-Naturwissenschaftliche Fakult\"at der}}
+\centerline{{\large\sc \@institut}}
+\vspace{1em}
+\centerline{{\large\sc Rheinische Friedrich-Wilhelms-Universit\"at Bonn}}
+
+\end{center}
+
+\vfil\null
+\clearpage
+\thispagestyle{empty}\mbox{}
+\clearpage
+\pagenumbering{arabic}
+
+\end{titlepage}
+
+  \setcounter{footnote}{0}%
+  \global\let\maketitle\relax
+  \global\let\@author\@empty
+  \global\let\@date\@empty
+  \global\let\@title\@empty
+  \global\let\title\relax
+  \global\let\author\relax
+  \global\let\date\relax
+  \global\let\and\relax
+}
+% END Titelseite
+
+\endinput

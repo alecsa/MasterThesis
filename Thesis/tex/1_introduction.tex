@@ -1,0 +1,45 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+% What is the problem?
+
+% Why is the problem important?
+
+% What are we doing for the problem?
+
+% How are we doing it?
+
+
+The Semantic Web is based on the idea of interconnected data that is both machine readable and machine understandable. In this way, the data is not only displayed to the users, but it is also processed by applications, in order to provide more intuitive results and comply to the growing needs of the current era of information.
+
+The common language for representing information about resources in the Semantic Web is RDF (Resource Description Framework). It is particularly intended for enabling information exchange between applications without loss of meaning. RDF represents metadata about Web resources in terms of simple properties and property values \cite{Manola2004}. As a result, it is possible to create semantically rich data models, made up of triples (subject-predicate-object), where subjects and objects are entities, and predicates indicate relationships between those entities \cite{Mutton2003}. Such models that define terms and concepts describing a specific area of knowledge are known as vocabularies (or ontologies).
+
+Ontologies play an important role in the development of Semantic Web, as they represent a way to give information a well-defined meaning \cite{Berners-Lee2001}.Their main purpose is to achieve data integration by providing shared conceptualizations of certain application domains. As a consequence, an increasing number of people in modern knowledge societies come into contact with ontologies. They are no longer exclusively used by ontology experts but also by other user groups, ranging from domain experts to non-expert users \cite{Lohmann2015}.
+
+RDF data can be represented textually using different formats, such as RDF/XML, JSON or Turtle. The latter stands for Terse RDF Triple Language \cite{Beckett2014} and it provides a better human readability in contrast to the other formats. However, when it comes to ontology development, using the previously mentioned text formats requires a certain level of technical knowledge. Since ontologies are often authored by domain experts who lack this kind of knowledge, a more intuitive method of development needs to be provided.
+
+RDF data is visually representable as well, due to its interconnectivity among the defined entities. A triple forms a graph with two nodes (the subject and the object), connected by an edge (the predicate). Therefore, an ontology can be viewed as a graph structure, enabling users to quickly grasp the defined concepts and relations. While many graph-based ontology visualization tools have been developed, only few support direct editing of the visual representation. Graph visualizations of ontologies are currently mainly used for presenting and exploring ontologies, but not as an entry point to engage with ontology editing. 
+
+
+\section {Contributions}
+
+Our work aims to lower the barrier for domain experts to engage with ontology development by providing the following:
+
+\begin{enumerate}
+	\item A visual editor that enables direct editing of the visualized graph. The user can import an already existing ontology and modify its structure or they can build one from scratch using the features offered by the editor. The graph elements (nodes and edges) are identifiable through a text label, that is, the URI of the entity they represent. They can be created or deleted and also edited by changing the text contained within their label.
+	\item A synchronization module meant to synchronize the visual editor with a code editor. This means that the changes performed on one of the editors are immediately propagated to the other one, without any user interaction. The module aims to assist the teaching process by providing the textual representation of each element in the RDF graph. Moreover, experienced users who are familiar with the Turtle syntax for RDF might prefer code editing, so instant visualization of the textually developed models may be helpful as well.
+	\item A clustering feature that provides a meaningful visualization of large RDF graphs. Based on similarity measures of the elements and also on topological aspects of the graph, this functionality groups nodes together into other node elements called clusters, in order to produce a more clear and easy to navigate graph structure.
+\end{enumerate}
+
+
+\section {Thesis Structure}
+
+The remainder of this document is structured as follows. In the \nameref{ch:related} chapter, we present a theoretical approach for synchronizing editors that feature both a textual and a graphical part, then we introduce a few already existing editors for RDF data, followed by a list of approaches aiming to solve the problems raised by visualizing semantic data. In the \nameref{ch:requirements} chapter, we list the problems that led to the development of our editor, together with the requirements that needed to be fulfilled with respect to graphical editing, synchronization and intuitive visualization. In the \nameref{ch:implementation} chapter, we start by presenting the project on which our editor is based, next we explain the high-level architecture of our solution and then we provide a step-by-step description of the developed modules. In the \nameref{ch:evaluation} chapter, we first determine how the implementation requirements were met, second, we analyze the time performance of the graphical functions and third, we show the results of a user study that we conducted in order to assess the usability of our editor. Finally, in \hyperref[ch:conclusions]{Conclusions}, we summarize our work, ending with a set of suggestions for future development.
+
+
+
+
+
+
+
+

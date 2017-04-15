@@ -1,0 +1,65 @@
+% info: https://en.wikibooks.org/wiki/LaTeX/Modular_Documents
+\documentclass[12pt,a4paper]{report}
+\usepackage{graphicx}
+%\usepackage{ifpdf}
+%\ifpdf
+%   % put here packages only for the PDF:
+%   \DeclareGraphicsExtensions{.pdf,.png,.jpg,.mps}
+%\else
+%   % put here packages only for the DVI:
+%\fi
+
+% put all the other packages here:
+
+\usepackage{thesisstyle}
+
+\begin{document}
+
+\input{./tex/title.tex}
+\makeatletter
+\let\newtitle\@title
+\let\newauthor\@authornew
+\let\newdate\@date
+\makeatother
+
+\maketitle
+
+\pagenumbering{gobble}
+\include{./tex/declaration}
+%\null\newpage
+\include{./tex/acknowledgements}
+%\null\newpage
+
+\pagenumbering{roman}
+\tableofcontents
+\listoffigures
+%\null\newpage
+%\null\newpage
+%\listoftables
+%\null\newpage
+%\null\newpage
+
+% Abstract
+\include{./tex/0_abstract}
+\pagenumbering{gobble}
+%\null\newpage
+
+\pagenumbering{arabic}
+
+% Chapters
+\include{./tex/1_introduction}
+\include{./tex/2_related_work}
+\include{./tex/3_requirements}
+\include{./tex/4_implementation}
+\include{./tex/5_evaluation}
+\include{./tex/6_conclusions}
+
+% Appendix
+%\include{./tex/appendix}
+
+% Bibliography
+\clearpage
+\bibliographystyle{ieeetr}
+\bibliography{bibliography}
+
+\end{document}

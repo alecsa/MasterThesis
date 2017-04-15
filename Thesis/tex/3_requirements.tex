@@ -1,0 +1,110 @@
+\chapter{Requirements}
+\label{ch:requirements}
+
+The development of a hybrid synchronized editor for RDF vocabularies was initially triggered by the lack of currently maintained graphical editors for semantic data. Having both a graphical and a code editor that are synchronized could be a good teaching method to help domain experts who lack technical knowledge, with authoring and updating RDF vocabularies.
+
+The code editing requirement has been already fulfilled as our implementation took off from the TurtleEditor project\footnote{\url{https://github.com/vocol/vocol/tree/master/TurtleEditor}}. This consists of an open-source
+web editor, which can load files from and commit changes to a central repository and offers features such as syntax highlighting, syntax checking and auto-completion \cite{Petersen2016}.
+
+The chapter is structured as follows: we start with highlighting the graphical editor requirements, then, we show what is demanded from the synchronization module and, finally, we explain what is needed for a good visualization of a graph which is based on RDF data. 
+
+
+\section {Graphical Editing}
+
+Having only a code editor turns out to be insufficient for authors lacking technical background, as they would still be bound to learning the syntax of the language in which the vocabulary is or needs to be written. Therefore, enabling editing through a graphical view is mandatory when it comes to ensuring intuitiveness and ease of understanding. 
+
+In order to fully enable creating and editing vocabularies in a graphical manner, a set of operations need to be made available to the graphical user interface through different types of forms. The following functions shall be supported:
+
+\begin{enumerate}
+  \item Creating nodes as a representation for subjects or objects
+  \begin{itemize}
+    \item Creating literals has to be differentiated from entities which are defined by URIs.
+    \item  For a successful creation, the user has to specify a label, that is, the URI of an entity (the prefixed version has to be accepted too) or a literal itself.
+    \item  The newly created node has to be easily identifiable in the graph.
+    \item  Creating duplicate nodes needs to be prohibited.
+  \end{itemize}
+  \item Editing nodes
+  \begin{itemize}
+    \item This assumes modifying the node's label.
+    \item Introducing a new label which is equal to another node's label has to be prohibited.
+  \end{itemize}
+  \item Deleting nodes
+  \begin{itemize}
+    \item Edges that are linked to the node also have to be deleted.
+    \item Deleting a node may imply leaving other nodes disconnected from the graph. The user has to be prompted regarding keeping or discarding these nodes.
+  \end{itemize}
+  \item Creating edges as a representation for predicates
+   \begin{itemize}
+    \item  For a successful creation, the user has to specify a label, that is, the URI of the property (the prefixed version has to be accepted too).
+    \item The edge has to link two nodes or a node to itself, but in the latter case, the user has to be prompted if this is the actual intention, since it is a rather unusual case.
+    \item Creating duplicate edges is allowed.
+  \end{itemize}
+  \item Editing edges
+   \begin{itemize}
+    \item This assumes modifying the edge's label.
+    \item Introducing a new label which is equal to another edge's label is allowed.
+  \end{itemize}
+  \item Deleting edges
+  \begin{itemize}
+    \item Deleting an edge may imply leaving certain nodes disconnected from the graph. The user has to be prompted regarding keeping or discarding these nodes.
+  \end{itemize}
+\end{enumerate}
+
+
+\section {Synchronization}
+
+Creating or updating vocabularies with the help of a graphical editor and, later on, exporting the modifications to a file, like in the case of IsaViz (see \autoref{sec:editors}), may be insufficient when teaching purposes are involved, as it is cumbersome to track each graphical change into text. Having an instant synchronization with a code view turns out to be more effective because the user can immediately spot the modified line of code and learn step-by-step. At the same time, supporting the inverse synchronization (from code to visual) is also important because it eliminates the need of user interaction for keeping both views updated and it becomes easier to detect possible mistakes in the model as code modifications are instantly visualized.
+
+The two-way synchronization shall follow certain rules for keeping the model consistent and preventing the propagation of errors between the two views. Therefore, for updating the graphical side as a result of textual modifications, the syntax check function of the TurtleEditor shall be used. As a result, the synchronization process shall be triggered only when the code changes do not introduce any error. For updating the text view, we need a set of rules that apply for each of the graphical editor functions we presented in the last section:
+
+\begin{enumerate}
+  \item Creating a node - no update shall occur as the new nodes will be floating around, unlinked to the graph (no new triples are introduced until they get connected to other nodes).
+  \item Editing a node - update the corresponding triple in the text view.
+  \item Deleting a node - remove from the code all triples containing this node as a subject or an object.
+  \item Creating an edge - introduce in the code the triple formed as a result of linking two nodes.
+  \item Editing an edge - update the corresponding triple in the text view.
+  \item Deleting an edge - remove the associated triple from the code.
+\end{enumerate}
+
+In order to better track the synchronization updates, the two editors shall be simultaneously visible so a split view is required. Moreover, each node shall be easily trackable in the code so a click event in the graphical view should determine the code editor update its view to the line containing the corresponding triple, together with the highlight of the associated term. The highlights shall also be seen on the scrollbar as this is useful when the node is contained in multiple triples.
+
+
+\section {Visualization}
+
+Visualizing semantic data is not a trivial task as an ontology can easily reach thousands of triples (see \autoref{sec:visualizing_semantic_data}). Therefore, certain functionalities are required in order to make browsing the graph easier and more intuitive.
+
+When a graph reaches a certain size and it becomes hard to manage, a trivial solution is grouping similar nodes together. So a first requirement that would facilitate the data visualization is clustering. This implies finding the appropriate criteria that determine the similarity and, at the same time, taking into account topological aspects. In what follows, we will define the nodes having exactly one neighbor as outliers. We considered sufficient to cluster only the outliers together with the node that they are linked to, as this is equivalent to group a subject and all its properties. The graph clustering shall be possible until there are no more outliers, meaning that clusters can be grouped together with other clusters. From our observations, this also makes sense semantically, as most of the times the outlier clusters represent subclasses of the cluster node they are linked to.
+
+While visualizing large graphs, we noticed that there are certain nodes which are highly connected, meaning that they have more edges than the others. Usually, these nodes are part of namespaces like \textit{RDF}, \textit{RDFS} and \textit{OWL}. Therefore, we consider another requirement enabling the possibility to hide these nodes and their edges as this would remove the clutter that they generate.
+
+Another solution that would eliminate the clutter is increasing the distance between nodes. However, this proves itself to be unfeasible as it would burden the graph navigation due to its wide expansion in space. Also considerable is the idea of duplicating the literals for each subject, used by VoCol (see \autoref{sec:editors}), because this would make clustering cleaner - each literal would become outlier and be grouped with its subject, otherwise it will always appear in the graph, no matter how many clustering levels are applied. We will not consider this requirement, though, because it would violate our premise that each node is unique.
+
+The graph visualization shall be ruled by certain laws of physics that determine a level of gravitation between nodes, similar to what was explained in \autoref{sec:visualizing_semantic_data}. Therefore, these rules will decide how nodes will be floating around and how far they will be from each other so, even if they are dragged by the user, they will always come back to their predetermined position. We considered that, at some point, the user will need to move the nodes out of different reasons (e.g. grouping, easier browsing etc.) so another requirement we are stating is the possibility to disable the physics, i.e., freezing the nodes as they are dragged to certain positions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
